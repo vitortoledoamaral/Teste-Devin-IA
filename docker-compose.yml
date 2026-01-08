@@ -59,6 +59,26 @@ services:
     networks:
       - laravel-network
 
+  # Container do phpMyAdmin para gerenciamento do banco de dados
+  phpmyadmin:
+    image: phpmyadmin:latest
+    container_name: laravel-phpmyadmin
+    restart: unless-stopped
+    ports:
+      # Mapeia a porta 8081 do host para a porta 80 do container
+      - "8081:80"
+    environment:
+      # Configurações de conexão com o MySQL
+      PMA_HOST: db
+      PMA_PORT: 3306
+      PMA_USER: ${DB_USERNAME:-laravel}
+      PMA_PASSWORD: ${DB_PASSWORD:-secret}
+      UPLOAD_LIMIT: 64M
+    networks:
+      - laravel-network
+    depends_on:
+      - db
+
 # Definição das redes
 networks:
   laravel-network:

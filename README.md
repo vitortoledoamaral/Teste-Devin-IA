@@ -4,11 +4,12 @@ Sistema basico de cadastro e autenticacao de usuarios utilizando Laravel, MySQL 
 
 ## Visao Geral da Arquitetura
 
-Este projeto utiliza uma arquitetura de microservicos containerizada com Docker, composta por tres containers principais:
+Este projeto utiliza uma arquitetura de microservicos containerizada com Docker, composta por quatro containers:
 
 1. **app (PHP-FPM)**: Container da aplicacao Laravel com PHP 8.2 e todas as extensoes necessarias
 2. **webserver (Nginx)**: Servidor web que recebe as requisicoes HTTP e as encaminha para o PHP-FPM
 3. **db (MySQL 8.0)**: Banco de dados relacional para persistencia dos dados
+4. **phpmyadmin**: Interface web para gerenciamento do banco de dados MySQL
 
 ### Diagrama da Arquitetura
 
@@ -234,7 +235,24 @@ docker-compose exec app composer require nome/pacote
 | Servico | Porta Host | Porta Container |
 |---------|------------|-----------------|
 | Nginx (Web) | 8080 | 80 |
+| phpMyAdmin | 8081 | 80 |
 | MySQL | 3306 | 3306 |
+
+## phpMyAdmin
+
+O phpMyAdmin esta disponivel para gerenciamento visual do banco de dados MySQL.
+
+**Acesso**: http://localhost:8081
+
+**Credenciais**:
+- Usuario: laravel (ou o valor de DB_USERNAME no .env)
+- Senha: secret (ou o valor de DB_PASSWORD no .env)
+
+Com o phpMyAdmin voce pode:
+- Visualizar e editar tabelas
+- Executar queries SQL
+- Importar e exportar dados
+- Gerenciar usuarios do banco de dados
 
 ## Expansoes Futuras
 
