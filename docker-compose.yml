@@ -1,0 +1,70 @@
+# Docker Compose para o sistema de autenticação Laravel
+# Versão do Docker Compose
+version: '3.8'
+
+# Definição dos serviços (containers)
+services:
+  # Container da aplicação Laravel (PHP-FPM)
+  app:
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile
+    image: laravel-auth-app
+    container_name: laravel-app
+    restart: unless-stopped
+    working_dir: /var/www
+    volumes:
+      # Monta o código fonte no container
+      - ./:/var/www
+    networks:
+      - laravel-network
+    depends_on:
+      - db
+
+  # Container do servidor web Nginx
+  webserver:
+    image: nginx:alpine
+    container_name: laravel-nginx
+    restart: unless-stopped
+    ports:
+      # Mapeia a porta 8080 do host para a porta 80 do container
+      - "8080:80"
+    volumes:
+      # Monta o código fonte para servir arquivos estáticos
+      - ./:/var/www
+      # Monta a configuração do Nginx
+      - ./docker/nginx/nginx.conf:/etc/nginx/conf.d/default.conf
+    networks:
+      - laravel-network
+    depends_on:
+      - app
+
+  # Container do banco de dados MySQL
+  db:
+    image: mysql:8.0
+    container_name: laravel-mysql
+    restart: unless-stopped
+    environment:
+      # Configurações do MySQL (devem corresponder ao .env do Laravel)
+      MYSQL_DATABASE: ${DB_DATABASE:-laravel_auth}
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-secret}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-secret}
+      MYSQL_USER: ${DB_USERNAME:-laravel}
+    ports:
+      # Mapeia a porta 3306 para acesso externo (opcional, útil para debug)
+      - "3306:3306"
+    volumes:
+      # Volume para persistência dos dados do MySQL
+      - mysql-data:/var/lib/mysql
+    networks:
+      - laravel-network
+
+# Definição das redes
+networks:
+  laravel-network:
+    driver: bridge
+
+# Definição dos volumes para persistência
+volumes:
+  mysql-data:
+    driver: local
